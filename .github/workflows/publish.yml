@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Check out tagged source
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
 
@@ -96,7 +96,11 @@ jobs:
         run: |
           set -euo pipefail
           response="${RUNNER_TEMP}/crates-io-version.json"
-          status="$(curl --silent --show-error +            --user-agent "playhound-release/${GITHUB_RUN_ID}" +            --output "${response}" +            --write-out "%{http_code}" +            "https://crates.io/api/v1/crates/playhound/${VERSION}")"
+          status="$(curl --silent --show-error \
+            --user-agent "playhound-release/${GITHUB_RUN_ID}" \
+            --output "${response}" \
+            --write-out "%{http_code}" \
+            "https://crates.io/api/v1/crates/playhound/${VERSION}")"
           case "${status}" in
             200)
               registry_checksum="$(jq -r '.version.checksum' "${response}")"
