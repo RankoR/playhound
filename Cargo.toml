@@ -1,0 +1,70 @@
+[workspace]
+members = ["xtask"]
+default-members = ["."]
+resolver = "2"
+
+[package]
+name = "playhound"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "A typed, async-first Google Play metadata scraper with a companion CLI"
+license = "EUPL-1.2"
+repository = "https://github.com/RankoR/playhound"
+documentation = "https://docs.rs/playhound"
+readme = "README.md"
+keywords = ["google-play", "android", "scraper", "reviews", "cli"]
+categories = ["api-bindings", "command-line-utilities", "web-programming::http-client"]
+publish = ["crates-io"]
+exclude = [".agents/", ".codex/", ".github/", "xtask/"]
+
+[features]
+default = ["cli"]
+cli = ["dep:clap", "dep:tokio", "dep:tracing-subscriber"]
+blocking = ["reqwest/blocking"]
+
+[dependencies]
+clap = { version = "4.6", features = ["derive", "env"], optional = true }
+futures-util = "0.3"
+futures-timer = "3"
+fastrand = "2"
+governor = "0.10"
+jiff = { version = "0.2", features = ["serde"] }
+reqwest = { version = "0.13", default-features = false, features = ["brotli", "charset", "deflate", "form", "gzip", "http2", "json", "query", "rustls", "socks", "stream", "system-proxy", "zstd"] }
+# Newer releases use language syntax unavailable at the documented Rust 1.85 MSRV.
+scraper = { version = "=0.25.0", default-features = false }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1.52", features = ["macros", "rt-multi-thread", "time"], optional = true }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"], optional = true }
+url = { version = "2", features = ["serde"] }
+
+[dev-dependencies]
+proptest = "1"
+tokio = { version = "1.52", features = ["macros", "rt-multi-thread", "time", "test-util"] }
+
+[lib]
+doctest = false
+
+[[bin]]
+name = "playhound"
+path = "src/main.rs"
+required-features = ["cli"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints.rust]
+missing_docs = "warn"
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+needless_pass_by_value = "allow"
+doc_markdown = "allow"
