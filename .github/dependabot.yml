@@ -11,4 +11,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
-
+    # `stable` follows current Rust, while `1.85.0` is the deliberate MSRV.
+    ignore:
+      - dependency-name: dtolnay/rust-toolchain
