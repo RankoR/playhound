@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/RankoR/playhound/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/RankoR/playhound/actions/workflows/ci.yml)
 [![Publish to crates.io](https://github.com/RankoR/playhound/actions/workflows/publish.yml/badge.svg)](https://github.com/RankoR/playhound/actions/workflows/publish.yml)
-[![crates.io](https://img.shields.io/crates/v/playhound.svg)](https://crates.io/crates/playhound)
+[![crates.io](https://img.shields.io/crates/v/playhound.svg?cacheSeconds=300)](https://crates.io/crates/playhound)
 
 PlayHound is an unofficial, typed Google Play metadata scraper for Rust. It
 provides:
