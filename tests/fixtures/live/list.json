@@ -1,0 +1,53 @@
+[
+  {
+    "app_id": "com.example.app",
+    "developer": "Example Developer",
+    "developer_id": "EXAMPLE_DEVELOPER",
+    "icon_url": "https://example.invalid/image.png",
+    "is_free": true,
+    "price": {
+      "currency": "USD",
+      "formatted": "",
+      "micros": 0
+    },
+    "score": 4.7682157,
+    "score_text": "4.8",
+    "store_url": "https://play.google.com/store/apps/details?id=com.example.app",
+    "summary": "Example application summary.",
+    "title": "Example App"
+  },
+  {
+    "app_id": "com.example.app",
+    "developer": "Example Developer",
+    "developer_id": "EXAMPLE_DEVELOPER",
+    "icon_url": "https://example.invalid/image.png",
+    "is_free": true,
+    "price": {
+      "currency": "USD",
+      "formatted": "",
+      "micros": 0
+    },
+    "score": 3.842209,
+    "score_text": "3.8",
+    "store_url": "https://play.google.com/store/apps/details?id=com.example.app",
+    "summary": "Example application summary.",
+    "title": "Example App"
+  },
+  {
+    "app_id": "com.example.app",
+    "developer": "Example Developer",
+    "developer_id": "EXAMPLE_DEVELOPER",
+    "icon_url": "https://example.invalid/image.png",
+    "is_free": true,
+    "price": {
+      "currency": "USD",
+      "formatted": "",
+      "micros": 0
+    },
+    "score": 4.5327606,
+    "score_text": "4.5",
+    "store_url": "https://play.google.com/store/apps/details?id=com.example.app",
+    "summary": "Example application summary.",
+    "title": "Example App"
+  }
+]

@@ -1,0 +1,31 @@
+name: Bug report
+description: Report reproducible incorrect behavior
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the observed and expected behavior without private data.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: PlayHound version
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Redact proxy credentials, tokens, review IDs, and personal data.
+    validations:
+      required: true
+  - type: dropdown
+    id: client
+    attributes:
+      label: Interface
+      options: [Async library, Blocking library, CLI]
+    validations:
+      required: true
+

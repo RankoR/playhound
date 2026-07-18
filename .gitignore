@@ -1,0 +1,35 @@
+# Rust and Cargo build output
+/target/
+**/*.rs.bk
+
+# Test coverage and profiling output
+*.profraw
+*.profdata
+coverage.lcov
+lcov.info
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+/.cargo/credentials
+/.cargo/credentials.toml
+*.key
+*.pem
+
+# Editors and IDEs
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp

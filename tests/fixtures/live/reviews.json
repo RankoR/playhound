@@ -1,0 +1,26 @@
+[
+  {
+    "app_version": "1.2.3",
+    "date": "2026-01-02T03:04:05Z",
+    "developer_reply": null,
+    "id": "example-review-id",
+    "score": 4,
+    "text": "Example review text.",
+    "thumbs_up": 0,
+    "title": null,
+    "user_image_url": "https://example.invalid/image.png",
+    "user_name": "Example User"
+  },
+  {
+    "app_version": "1.2.3",
+    "date": "2026-01-02T03:04:05Z",
+    "developer_reply": null,
+    "id": "example-review-id",
+    "score": 5,
+    "text": "Example review text.",
+    "thumbs_up": 0,
+    "title": null,
+    "user_image_url": "https://example.invalid/image.png",
+    "user_name": "Example User"
+  }
+]
