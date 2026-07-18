@@ -4,12 +4,18 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to validate
+        required: true
+        type: string
 
 permissions:
   contents: read
 
 concurrency:
-  group: crates-io-${{ github.ref }}
+  group: crates-io-${{ inputs.tag || github.ref }}
   cancel-in-progress: false
 
 env:
@@ -19,7 +25,7 @@ env:
 
 jobs:
   publish:
-    name: Publish ${{ github.ref_name }}
+    name: Publish ${{ inputs.tag || github.ref_name }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,6 +36,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
 
       - name: Install stable Rust
         uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4
@@ -38,17 +45,25 @@ jobs:
 
       - name: Validate tag and release commit
         id: release
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
         shell: bash
         run: |
           set -euo pipefail
           version="$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "playhound") | .version')"
           expected_tag="v${version}"
-          if [[ "${GITHUB_REF_NAME}" != "${expected_tag}" ]]; then
-            echo "::error::Tag ${GITHUB_REF_NAME} does not match Cargo.toml version ${version}"
+          if [[ "${RELEASE_TAG}" != "${expected_tag}" ]]; then
+            echo "::error::Tag ${RELEASE_TAG} does not match Cargo.toml version ${version}"
+            exit 1
+          fi
+          tag_commit="$(git rev-parse "refs/tags/${RELEASE_TAG}^{commit}")"
+          release_commit="$(git rev-parse HEAD)"
+          if [[ "${release_commit}" != "${tag_commit}" ]]; then
+            echo "::error::Checked-out commit does not match tag ${RELEASE_TAG}"
             exit 1
           fi
           git fetch --no-tags origin main
-          if ! git merge-base --is-ancestor "${GITHUB_SHA}" origin/main; then
+          if ! git merge-base --is-ancestor "${release_commit}" origin/main; then
             echo "::error::Release tag must point to a commit reachable from main"
             exit 1
           fi
@@ -88,7 +103,7 @@ jobs:
       - name: Inspect package contents
         run: cargo package --all-features --locked --list
 
-      - name: Check whether this exact package is already published
+      - name: Check whether these exact package contents are already published
         id: registry
         env:
           VERSION: ${{ steps.release.outputs.version }}
@@ -104,15 +119,36 @@ jobs:
           case "${status}" in
             200)
               registry_checksum="$(jq -r '.version.checksum' "${response}")"
-              package_checksum="$(sha256sum "target/package/playhound-${VERSION}.crate" | cut -d ' ' -f 1)"
-              if [[ "${registry_checksum}" != "${package_checksum}" ]]; then
-                echo "::error::Version ${VERSION} exists on crates.io with different contents"
-                exit 1
+              local_package="target/package/playhound-${VERSION}.crate"
+              local_checksum="$(sha256sum "${local_package}" | cut -d ' ' -f 1)"
+              if [[ "${registry_checksum}" != "${local_checksum}" ]]; then
+                published_package="${RUNNER_TEMP}/playhound-${VERSION}.crate"
+                curl --fail --location --silent --show-error \
+                  --user-agent "playhound-release/${GITHUB_RUN_ID}" \
+                  --output "${published_package}" \
+                  "https://crates.io/api/v1/crates/playhound/${VERSION}/download"
+                downloaded_checksum="$(sha256sum "${published_package}" | cut -d ' ' -f 1)"
+                if [[ "${registry_checksum}" != "${downloaded_checksum}" ]]; then
+                  echo "::error::Downloaded crate checksum does not match crates.io metadata"
+                  exit 1
+                fi
+                local_payload_checksum="$(gzip --decompress --stdout "${local_package}" | sha256sum | cut -d ' ' -f 1)"
+                published_payload_checksum="$(gzip --decompress --stdout "${published_package}" | sha256sum | cut -d ' ' -f 1)"
+                if [[ "${local_payload_checksum}" != "${published_payload_checksum}" ]]; then
+                  echo "::error::Version ${VERSION} exists on crates.io with different package contents"
+                  exit 1
+                fi
+                echo "Compressed archives differ, but their verified package payloads are identical."
+              else
+                echo "Version ${VERSION} is already published with the same archive checksum."
               fi
-              echo "Version ${VERSION} is already published with the same checksum."
               echo "exists=true" >> "${GITHUB_OUTPUT}"
               ;;
             404)
+              if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+                echo "::error::Manual runs can validate only versions that already exist on crates.io"
+                exit 1
+              fi
               echo "exists=false" >> "${GITHUB_OUTPUT}"
               ;;
             *)

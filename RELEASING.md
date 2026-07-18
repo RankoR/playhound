@@ -31,8 +31,9 @@ Trusted Publishing can be enabled only after the first crate version exists.
 5. In GitHub, create a repository ruleset for `v*` tags. Restrict tag creation,
    updates, and deletion to trusted maintainers.
 6. Push `v0.1.0`. The workflow recognizes that the version already exists and
-   succeeds only if the crates.io checksum matches the package built from the
-   tag.
+   succeeds only if the verified crates.io package contents match the package
+   built from the tag. Differences in gzip encoding between Cargo versions do
+   not cause a false failure.
 
 No long-lived crates.io token is stored in GitHub. The official crates.io
 authentication action exchanges GitHub's OIDC identity for a short-lived token
@@ -76,7 +77,11 @@ and revokes it after the job.
    - the tagged commit is reachable from `main`;
    - formatting, linting, tests, docs, feature boundaries, and MSRV pass;
    - the crates.io package builds and verifies;
-   - an already-published version has the same crate checksum.
+   - an already-published version has the same verified package contents.
+
+To validate an existing release again without moving its immutable tag, run
+the `Publish to crates.io` workflow manually from `main` and enter the existing
+tag (for example, `v0.1.0`). Manual runs never publish a missing version.
 
 9. After crates.io publication succeeds, create the corresponding GitHub
    Release from the existing tag and use the matching changelog section as its
